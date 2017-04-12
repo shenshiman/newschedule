@@ -1,0 +1,263 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=no">
+  <title>宗毅行程</title>
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Lato:300,400,700">
+  <link rel="stylesheet" href="http://weloveiconfonts.com/api/?family=fontawesome">
+  <link rel="stylesheet" href="assets/css/style-personal.css">
+  <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+  <script src="http://code.jquery.com/jquery-latest.min.js" type="text/javascript"></script>
+  <script src="assets/js/simplecalendar.js" type="text/javascript"></script>
+  <script src="https://g.alicdn.com/ilw/ding/0.6.6/scripts/dingtalk.js" type="text/javascript"></script>
+  <script>
+      window.onload = function () {
+
+          history.pushState(null, null, document.URL);
+          window.addEventListener('popstate', function () {
+              history.pushState(null, null, document.URL);
+          });
+
+          var height = document.documentElement.clientHeight;
+          //alert(height);
+          $(".container").css("height", height - 80 + 'px');
+
+          //alert("aa");
+
+          dd.ready(function () {
+              dd.runtime.permission.requestAuthCode({
+                  corpId: GetQueryString("corpid"),
+                  onSuccess: function (result) {
+                      $.ajax({
+                          type: "Post",
+                          url: "Hanlder.aspx/getUserName",
+                          data: "{'Code':'" + result.code + "'}",
+                          contentType: "application/json; charset=utf-8",
+                          async: false,
+                          timeout: 30000, //超时时间设置，单位毫秒
+                          dataType: "json",
+                          success: function (data) {
+                              //alert(data.d);
+                              var name = data.d;
+                              //$("#NAMES").val(data.d);
+                              //alert($("#NAMES").val());
+                              //                              if (data.d == "张艳" || data.d == "沈仕满" || data.d == "魏文华" || data.d == "宗毅" || data.d == "吴柳荷" || data.d == "王刚") {
+                              //                                  //alert("a");
+                              //                              } else {
+                              //                                  //alert("a")
+                              //                                  $("#bjan").css("display", "none");
+                              //                              }
+                              var url = location.search;
+                              var idd = url.split("?")[1].split("=")[1];
+                              //alert(idd);
+                              $(".day-event").click(function () {
+                                  var id = $(this).attr('id');
+
+                                  //alert(id);
+                                  location.href = "Search.aspx?ID=" + id + "&&Name=" + name + "&&corpid=" + idd;
+                              })
+                              $("#newf").click(function () {
+
+                                  var dddd = $(".active").attr("date-day");
+                                  var mmmm = $(".active").attr("date-month");
+                                  var yyyy = $(".active").attr("date-year");
+                                  var dates = yyyy + "-" + mmmm + "-" + dddd;
+                                  //var datesss = new Date();
+                                  // var nowdays = datesss.toLocaleDateString();
+
+                                  var date = new Date();
+                                  var yy = date.getFullYear();
+                                  var mm = date.getMonth() + 1;
+                                  var dd = date.getDate();
+                                  //mm <= 9 ? mm = "0" + mm : mm = mm;
+                                  //dd <= 9 ? dd = "0" + dd : dd = dd;
+                                  var nowdays = yy + "-" + mm + "-" + dd;
+                                  //alert(nowdays);
+                                  //alert(dates);
+                                  //alert(nowdays);
+                                  //var datess = $("#Date1").val();
+                                  dates = new Date(dates.replace(/\-/g, "\/"));
+                                  nowdays = new Date(nowdays.replace(/\-/g, "\/"));
+                                  //alert(dates);
+                                  //alert(dddd);
+                                  if (dddd == undefined) {
+                                      alert("请选择日期！");
+                                  } else {
+
+                                      if (Date.parse(dates) >= Date.parse(nowdays)) {
+
+                                          if (data.d == "张艳" || data.d == "沈仕满" || data.d == "魏文华" || data.d == "宗毅" || data.d == "吴柳荷" || data.d == "王刚") {
+                                              //alert("a");
+                                              var riqi = $(".active").attr("date-day");
+                                              var mouthss = $(".active").attr("date-month");
+                                              //alert(riqi);
+                                              location.href = "Default.aspx?Name=" + name + "&&Riqi=" + riqi + "&&Yuefen=" + mouthss + "&&corpid=" + idd; ;
+                                              //alert($(".active").text());
+                                          } else {
+                                              alert("你没有权限新建行程");
+                                          }
+                                      } else {
+                                          alert("不可新建过期行程！");
+                                      }
+                                  }
+                              })
+                              $(".close").click(function (event) {
+                                  //event.stopPropagation();
+                                  //event.preventDefault();
+                                  var _this = $(this);
+                                  var nowname = data.d;
+
+                                  if (data.d == "张艳" || data.d == "沈仕满" || data.d == "魏文华" || data.d == "宗毅" || data.d == "吴柳荷" || data.d == "王刚") {
+                                      var idd = $(this).parent().attr('id');
+                                      var selectname = $(this).parent().attr('name');
+                                      //alert(idd);
+                                      var self = $(this).parent();
+                                      if (selectname == nowname) {
+                                          if (confirm("是否删除该行数据")) {
+
+                                              $(this).parent().slideUp('fast');
+                                              event.stopPropagation();
+                                              event.preventDefault();
+
+
+                                              $.ajax({
+                                                  type: "Post",
+                                                  url: "Hanlder.aspx/deleteSchedule",
+                                                  data: "{'ID':'" + idd + "'}",
+                                                  contentType: "application/json; charset=utf-8",
+                                                  async: true,
+                                                  timeout: 30000, //超时时间设置，单位毫秒
+                                                  dataType: "json",
+                                                  success: function () {
+                                                      setTimeout(function () {
+                                                          location.reload();
+                                                      },500)
+                                                      
+                                                      self.remove();
+                                                      //alert(data.d);
+                                                      //$(".calendar").html();
+                                                  },
+                                                  error: function () {
+                                                  }
+                                              })
+                                          } else {
+                                              //alert("a");
+                                              //$(".close").eq(0).slideDown("fast");
+
+                                              _this.parent().stop();
+                                              return false;
+                                          }
+                                      } else {
+                                          alert("你只能删除自己新建的行程！");
+                                          _this.parent().stop();
+                                          return false;
+                                      }
+                                  } else {
+                                      alert("你没有权限删除");
+                                      event.stopPropagation();
+                                      event.preventDefault();
+                                  }
+                              })
+
+                          },
+                          error: function (err) {
+                              alert("查询出现错误！");
+                          }
+
+
+                      });
+                  },
+                  onFail: function (err) { }
+
+              })
+          });
+
+          function GetQueryString(name) {
+
+              var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+
+              var r = window.location.search.substr(1).match(reg);
+
+              if (r != null) return unescape(r[2]); return null;
+
+          }
+
+
+
+
+
+
+      }
+  </script>
+  <style>
+      .event-calendar tr td
+      {
+          color:#008CEE;}
+      .sat{
+      color:red !important;
+    }    
+    .current-day 
+    {
+        color:#fff !important;
+        }
+  </style>
+</head>
+<body>
+  <div class="container"style="overflow:auto;">
+   <div style="">
+    <div class="row">
+      <div class="col-lg-12" style="">
+       <!-- <h1 class="page-header">jQuery.<small>Simple-Event-Calendar</small>
+        </h1>-->
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="calendar hidden-print">
+          <header>
+            <h2 class="month"></h2>
+            <a class="btn-prev fontawesome-angle-left" href="#"></a>
+            <a class="btn-next fontawesome-angle-right" href="#"></a>
+          </header>
+          <table>
+            <thead class="event-days">
+              <tr></tr>
+            </thead>
+            <tbody class="event-calendar">
+              <tr class="1"></tr>
+              <tr class="2"></tr>
+              <tr class="3"></tr>
+              <tr class="4"></tr>
+              <tr class="5"></tr>
+            </tbody>
+          </table>
+          <div class="list">
+            <!--  <div class="day-event" date-day="2" date-month="2" date-year="2016"  data-number="1">
+              <a href="#" class="close fontawesome-remove"></a>
+              <h2 class="title">Lorem ipsum 1</h2>
+              <p>Lorem Ipsum är en utfyllnadstext från tryck- och förlagsindustrin. Lorem ipsum har varit standard ända sedan 1500-talet, när en okänd boksättare tog att antal bokstäver och blandade dem för att göra ett provexemplar av en bok.</p>
+            <label class="check-btn">
+              <input type="checkbox" class="save" id="save" name="" value=""/>-->
+              <!--<span>Save to personal list!</span>-->
+              <!--</label>
+            </div>-->
+          </div>
+        </div>
+      </div>
+     <!-- <div class="col-md-6">
+        <label class="print pull-right">
+        <span class="print-btn hidden-print">Print your list!</span>
+        </label>
+        <h2>Personal list</h2>
+        <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p>
+        <div class="person-list"></div>
+      </div>-->
+    </div>
+    </div>
+    
+  </div>
+  <div style="position:fixed;bottom:0;width:100%;height:80px;color:#008CEE;text-align:center;z-index:99999;font-size:1.8rem;line-height:80px;background:#ddd;" onclick=""id="newf">新建行程</div>
+</body>
+</html>
